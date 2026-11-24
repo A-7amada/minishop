@@ -1,0 +1,22 @@
+@model List<Product>
+<h1>@L["AdminProducts"]</h1><p><a href="/Admin/Shop/Coupons">@L["Coupons"]</a> / <a href="/Admin/Shop/Orders">@L["ManageOrders"]</a></p>
+<p><a class="btn" asp-action="Create">@L["AddProduct"]</a></p>
+<table>
+    <tr><th></th><th>@L["Name"]</th><th>@L["Price"]</th><th>@L["Stock"]</th><th></th></tr>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td style="font-size:1.5rem;">@p.Emoji</td>
+            <td>@p.Name<br /><small style="color:var(--muted);">@p.NameAr</small></td>
+            <td>@p.Price.ToString("0.00") EGP</td>
+            <td>@p.Stock</td>
+            <td>
+                <a class="btn" asp-action="Edit" asp-route-id="@p.Id">@L["Edit"]</a>
+                <form class="inline" asp-action="Delete" asp-route-id="@p.Id" method="post"
+                      onsubmit="return confirm('@L["ConfirmDelete", p.Name]');">
+                    <button class="btn-danger" type="submit">@L["Delete"]</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

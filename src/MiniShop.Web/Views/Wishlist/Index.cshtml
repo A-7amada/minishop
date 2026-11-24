@@ -1,0 +1,4 @@
+@model List<Product>
+<p class="eyebrow">MINISHOP / @L["Wishlist"]</p><h1>@L["Wishlist"]</h1>
+@if(Model.Count==0){<div class="empty-state"><p>@L["EmptyWishlist"]</p><a class="btn" href="/">@L["BrowseProducts"]</a></div>}
+<div class="grid">@foreach(var p in Model){@await Html.PartialAsync("_ProductCard",p)}</div>

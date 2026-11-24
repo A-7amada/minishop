@@ -1,0 +1,14 @@
+<h1>@L["RegisterTitle"]</h1>
+<div class="form-card">
+    @if (ViewBag.Error != null) { <p class="error">@ViewBag.Error</p> }
+    <form method="post">
+        <label>@L["FullName"]</label>
+        <input type="text" name="fullName" required />
+        <label>@L["Email"]</label>
+        <input type="email" name="email" required />
+        <label>@L["Password"]</label>
+        <input type="password" name="password" required />
+        <button class="btn-block" type="submit">@L["Register"]</button>
+    </form>
+    <p style="margin-bottom:0;">@L["AlreadyHaveAccount"] <a asp-action="Login">@L["Login"]</a></p>
+</div>

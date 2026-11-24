@@ -1,0 +1,13 @@
+@model Order
+@{var ar=System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName=="ar";}
+<div class="card success-hero">
+    <div class="check">✅</div>
+    <h1>@L["OrderPlaced"]</h1>
+    <p style="color:var(--muted);">@L["OrderSummary", Model.Id, Model.Total.ToString("0.00")]</p>
+    <p id="order-payment"><strong>@L["PaymentMethod"]:</strong> @(Model.PaymentMethod=="COD"?L["PayCodOption"]:L["PayMockOption"]) · @L[Model.PaymentStatus]</p>
+    @if(Model.PaymentMethod=="COD"){<p id="cod-due"><strong>@L["AmountDue"]:</strong> @Model.Total.ToString("N2") EGP</p>}
+    <p><strong>@L["ShippingAddress"]:</strong> @Model.FullName · @Model.Phone<br/>@Model.AddressLine, @Model.City, @(ar?Model.GovernorateAr:Model.Governorate)</p>
+    <p class="demo-note">@L["ShippingDemoNote"]</p>
+    <p>@L["SeeMyOrders"] <a asp-controller="Account" asp-action="Orders">@L["MyOrders"]</a>.</p>
+    <a class="btn" asp-controller="Home" asp-action="Index">@L["ContinueShopping"]</a>
+</div>

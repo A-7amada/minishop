@@ -1,0 +1,4 @@
+@model List<Order>
+<h1>@L["ManageOrders"]</h1><p>@L["DemoTracking"]</p>
+@if(TempData["Error"] is string error){<p class="error">@L[error]</p>}
+@foreach(var order in Model){@await Html.PartialAsync("_OrderCard",order)<p>@order.UserEmail</p>@if(order.Status!="Delivered"&&order.Status!="Cancelled"){var steps=new[]{"Confirmed","Processing","Shipped","Delivered"};var next=steps[Array.IndexOf(steps,order.Status)+1];<form asp-action="Status" method="post"><input type="hidden" name="id" value="@order.Id"/><input type="hidden" name="status" value="@next"/><button>@L["UpdateStatus"]: @L[next]</button></form>}}

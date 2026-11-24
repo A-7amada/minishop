@@ -1,0 +1,20 @@
+@inject MiniShop.Application.Services.CartService Cart
+@inject MiniShop.Application.Services.ShopService Offers
+@{var isAr=System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName=="ar";var returnUrl=Context.Request.Path+Context.Request.QueryString;}
+<!DOCTYPE html><html lang="@(isAr?"ar":"en")" dir="@(isAr?"rtl":"ltr")"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>MiniShop | @L["Products"]</title><link rel="stylesheet" href="~/css/site.css"/></head>
+<body><a class="skip" href="#main">@(isAr?"انتقل للمحتوى":"Skip to content")</a>
+@if(Context.Request.Path.StartsWithSegments("/Admin")){<div class="admin-banner">@L["AdminDemoNotice"]</div>}
+<div class="promo">@((await Offers.CouponsAsync()).Any(c=>c.Code=="WELCOME10" && c.IsActive && c.Percent==10 && c.MinimumSpend==0 && c.ExpiresAt>DateTime.UtcNow) ? L["Promo"] : L["DemoNotice"]) <span>↗</span></div>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="/" aria-label="MiniShop"><span class="brand-mark">m.</span>minishop<span class="brand-period">.</span></a>
+<form action="/" class="header-search" method="get"><span aria-hidden="true">⌕</span><input aria-label="@L["Search"]" name="q" value="@Context.Request.Query["q"]" placeholder="@L["SearchPlaceholder"]"/><button type="submit">@L["Search"]</button></form>
+<div class="header-actions"><a class="lang-switch" asp-area="" asp-controller="Culture" asp-action="Set" asp-route-culture="@(isAr?"en":"ar")" asp-route-returnUrl="@returnUrl">@L["OtherLanguage"]</a><a href="/Wishlist" class="icon-link" title="@L["Wishlist"]">♡ <span>@L["Wishlist"]</span></a><a href="/Cart" class="icon-link">@L["Cart"] <b class="cart-badge">@Cart.Count</b></a></div>
+</div><div class="nav-row"><nav aria-label="@(isAr?"التنقل الرئيسي":"Main navigation")"><a href="/">@L["All"]</a><a href="/?category=Desk#products">@L["Desk"]</a><a href="/?category=Audio#products">@L["Audio"]</a><a href="/?category=Displays#products">@L["Displays"]</a></nav><div class="account-nav">
+@if(User.Identity?.IsAuthenticated==true){<a href="/Account/Orders">@L["MyOrders"]</a>@if(User.HasClaim("is_admin","true")){<a href="/Admin/Products">@L["Admin"]</a><a href="/Admin/Shop/Coupons">@L["Coupons"]</a><a href="/Admin/Shop/Shipping">@L["ShippingConfig"]</a><a href="/Admin/Shop/Orders">@L["ManageOrders"]</a>}<form asp-area="" asp-controller="Account" asp-action="Logout" method="post"><button class="text-button">@L["Logout"]</button></form>}
+else{<a href="/Account/Login">@L["Login"]</a><a href="/Account/Register">@L["Register"]</a>}
+</div></div></header>
+<main id="main">@RenderBody()</main>
+<footer><a class="brand" href="/">minishop.</a><p>@L["FooterText"]</p><span>@L["DemoNotice"]</span></footer>
+<button class="chat-launch" id="chat-toggle" aria-expanded="false" aria-controls="chat-panel">✧ <span>@L["AssistantTitle"]</span></button>
+<section class="chat-panel" id="chat-panel" hidden aria-label="@L["AssistantTitle"]"><div class="chat-head"><div><strong>✧ @L["AssistantTitle"]</strong><small>@L["AssistantLabel"]</small></div><button class="chat-close" id="chat-close" aria-label="@L["Close"]">×</button></div><div id="chat-messages" aria-live="polite" role="log"><p class="bubble bot">@L["AssistantHello"]</p></div><div class="quick-questions"><button type="button">@L["AskCoupons"]</button><button type="button">@L["AskOrders"]</button><button type="button">@L["AskShipping"]</button></div><form id="chat-form" action="/Assistant/Ask" method="post" data-error="@L["ChatError"]">@Html.AntiForgeryToken()<label class="sr-only" for="chat-question">@L["AskPlaceholder"]</label><input id="chat-question" name="question" maxlength="500" minlength="2" required placeholder="@L["AskPlaceholder"]" autocomplete="off"/><button type="submit">@L["Send"]</button></form></section>
+<script src="~/js/store.js" defer></script></body></html>

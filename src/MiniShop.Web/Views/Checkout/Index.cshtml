@@ -1,0 +1,31 @@
+@using MiniShop.Domain.Entities
+@using MiniShop.Application.DTOs
+@model List<CartLine>
+@{var ar=System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName=="ar";
+var d=(CheckoutDraft)ViewBag.Draft;var regions=(List<ShippingRegion>)ViewBag.Regions;var q=(ShippingQuote)ViewBag.Quote;var st=(ShippingSettings)ViewBag.Settings;
+var isCod=d.Payment=="COD"&&!(bool)ViewBag.CodBlocked;var hasRegion=d.RegionId!=0&&(q.Free||q.Fee>0||q.Ok||!string.IsNullOrEmpty(q.ZoneName));
+var change="this.form.action='/Checkout/Draft';this.form.submit()";}
+<p class="eyebrow">MINISHOP / @L["CheckoutTitle"]</p><h1>@L["CheckoutTitle"]</h1>
+<form asp-action="Pay" method="post" class="checkout-grid" id="payform"><button class="sr-only" tabindex="-1" aria-hidden="true">@L["PayMock"]</button>
+<div><div class="banner">@L["MockOnly"]</div>
+<div class="card"><h2>@L["ShippingAddress"]</h2>
+<label>@L["FullName"]<input name="fullName" value="@d.FullName" required minlength="2" maxlength="80" autocomplete="name"/></label>
+<label>@L["Phone"]<input name="phone" value="@d.Phone" required pattern="\+?[0-9 \-]{8,16}" inputmode="tel" autocomplete="tel"/></label>
+<div class="two-cols"><label>@L["Governorate"]<select id="region" name="regionId" required onchange="@change"><option value="0">@L["SelectGov"]</option>@foreach(var r in regions.OrderBy(x=>ar?x.NameAr:x.Name)){<option value="@r.Id" selected="@(r.Id==d.RegionId)">@(ar?r.NameAr:r.Name)</option>}</select></label>
+<label>@L["City"]<input name="city" value="@d.City" required minlength="2" maxlength="60"/></label></div>
+<label>@L["StreetAddress"]<input name="line" value="@d.Line" required minlength="5" maxlength="200" autocomplete="street-address"/></label>
+@if(hasRegion&&q.MaxDays>0){<p class="delivery-est" id="eta">@L["EstDelivery",q.MinDays,q.MaxDays]</p>}else if(!hasRegion){<p class="delivery-est muted">@L["ChooseGovFee"]</p>}</div>
+<div class="card pay-methods"><h2>@L["PaymentMethod"]</h2>
+<label class="radio-card"><input type="radio" name="payment" value="Mock" checked="@(d.Payment!="COD")" onchange="@change"/><span><strong>@L["PayMockOption"]</strong></span></label>
+@if(st.CodEnabled){<label class="radio-card"><input type="radio" name="payment" value="COD" checked="@(d.Payment=="COD")" onchange="@change"/><span><strong>@L["PayCodOption"]</strong><small>@L["CodNote",st.CodFee.ToString("N2")]</small></span></label>}</div>
+<div class="card"><h2>@L["Product"]</h2>@foreach(var line in Model){<div class="summary-line"><span>@line.LocalizedName(ar) <small>× @line.Quantity</small></span><strong>@line.Subtotal.ToString("N2") EGP</strong></div>}</div></div>
+<aside class="card checkout-summary"><h2>@L["Total"]</h2><label for="coupon">@L["Coupon"]</label><div class="coupon-input"><input id="coupon" name="code" value="@ViewBag.Coupon" placeholder="WELCOME10" maxlength="24" form="payform"/><button type="submit" formaction="/Checkout/Coupon" formnovalidate id="apply-coupon">@L["ApplyCoupon"]</button></div>
+@if(!string.IsNullOrEmpty((string?)ViewBag.Coupon)){<button type="submit" name="clear" value="1" formaction="/Checkout/Coupon" formnovalidate class="text-button">@L["RemoveCoupon"]</button>}
+@if(ViewBag.Error is not null){<p class="error" role="alert">@L[(string)ViewBag.Error]</p>}
+<div class="summary-line"><span>@L["Subtotal"]</span><span>@Model.Sum(l=>l.Subtotal).ToString("N2") EGP</span></div><div class="summary-line discount"><span>@L["Discount"]</span><span>-@(((decimal)ViewBag.Discount).ToString("N2")) EGP</span></div>
+<div class="summary-line" id="ship-line"><span>@L["Shipping"]@if(hasRegion){<small> · @(ar?q.ZoneNameAr:q.ZoneName)</small>}</span><span id="ship-fee">@if(!hasRegion){<em>@L["SelectGovShort"]</em>}else if(q.Free){<strong class="free">@L["FreeLabel"]</strong>}else{@(q.Fee.ToString("N2")+" EGP")}</span></div>
+@if(isCod){<div class="summary-line"><span>@L["CodFee"]</span><span id="cod-fee">@(st.CodFee.ToString("N2")) EGP</span></div>}
+@if(hasRegion&&q.AmountToFree>0){<p class="free-ship-hint" id="free-hint">@L["FreeShipAdd",q.AmountToFree.ToString("N2")]</p>}else if(hasRegion&&q.Free){<p class="free-ship-hint ok">✓ @L["FreeShipUnlocked"]</p>}
+<div class="total-row"><span>@L["Total"]</span><strong id="grand-total">@(((decimal)ViewBag.Total).ToString("N2")) EGP</strong></div>
+<button class="btn-block" id="pay-btn" @(hasRegion?"":"disabled")>@(isCod?L["PlaceOrderCod"]:L["PayMock"])</button><p class="demo-note">@L["DemoNotice"]</p><p class="demo-note">@L["ShippingDemoNote"]</p></aside></form>
+<script>document.getElementById('coupon').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();document.getElementById('apply-coupon').click();}});</script>
