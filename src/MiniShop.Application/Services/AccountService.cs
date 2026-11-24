@@ -27,6 +27,26 @@ public class AccountService
     public async Task<AppUser?> ValidateLoginAsync(string email, string password)
     {
         var user = await _users.FindByEmailAsync(email.Trim().ToLowerInvariant());
-        return user is not null && PasswordHasher.Verify(password, user.PasswordHash, user.PasswordSalt) ? user : null;
+        return user is not null && user.IsActive && PasswordHasher.Verify(password, user.PasswordHash, user.PasswordSalt) ? user : null;
+    }
+
+    public Task<List<AppUser>> ListUsersAsync() => _users.ListAsync();
+
+    // Admin accounts cannot be deactivated or deleted from the admin area (demo lockout protection).
+    public async Task<bool> SetActiveAsync(int id, bool active)
+    {
+        var user = await _users.FindByIdAsync(id);
+        if (user is null || user.IsAdmin) return false;
+        user.IsActive = active;
+        await _users.UpdateAsync(user);
+        return true;
+    }
+
+    public async Task<bool> DeleteUserAsync(int id)
+    {
+        var user = await _users.FindByIdAsync(id);
+        if (user is null || user.IsAdmin) return false;
+        await _users.DeleteAsync(user);
+        return true;
     }
 }

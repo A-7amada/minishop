@@ -1,0 +1,7 @@
+@model List<MiniShop.Domain.Entities.AppUser>
+<h1>@L["Users"]</h1>
+@if(TempData["Error"] is string error){<p role="alert" class="error">@L[error]</p>}
+<p class="muted">@L["UsersAdminNote"]</p>
+<table class="table"><thead><tr><th>@L["Email"]</th><th>@L["Name"]</th><th>@L["Role"]</th><th>@L["Status"]</th><th></th></tr></thead><tbody>
+@foreach(var u in Model){<tr><td>@u.Email</td><td>@u.FullName</td><td>@(u.IsAdmin?L["Admin"].Value:L["Customer"].Value)</td><td>@(u.IsActive?L["Active"].Value:L["Inactive"].Value)</td><td>@if(!u.IsAdmin){<form asp-action="Toggle" method="post" class="inline-form"><input type="hidden" name="id" value="@u.Id"/><input type="hidden" name="active" value="@(u.IsActive?"false":"true")"/><button class="text-button">@(u.IsActive?L["Deactivate"].Value:L["Activate"].Value)</button></form><form asp-action="Delete" method="post" class="inline-form" onsubmit="return confirm('@L["ConfirmDeleteUser"]')"><input type="hidden" name="id" value="@u.Id"/><button class="text-button danger">@L["Delete"]</button></form>}</td></tr>}
+</tbody></table>

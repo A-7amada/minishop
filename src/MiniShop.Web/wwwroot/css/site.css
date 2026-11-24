@@ -15,3 +15,5 @@
 .checkout-grid label.radio-card{display:flex;margin-bottom:0}.checkout-grid .radio-card input[type=radio]{width:auto;margin:4px 0 0}
 
 .admin-banner{background:#fff4e0;color:#7a4d00;text-align:center;padding:.45rem .75rem;font-size:.85rem;border-bottom:1px solid #f0dcb0}
+
+.inline-form{display:inline}.inline-form .text-button.danger{color:#b3261e}

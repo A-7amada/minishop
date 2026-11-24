@@ -22,6 +22,8 @@ Open http://localhost:5000. A fresh SQLite database is created and seeded automa
 | Admin | admin@minishop.local | `Admin123!` in Development only |
 | Customer | demo@minishop.local | Demo123! |
 
+Hand the demo customer account to clients so they can tour the store (browse, save items, apply WELCOME10, place demo cash-on-delivery orders). The admin can deactivate or delete any customer account at `/Admin/Users`; admin accounts cannot be changed there. Demo orders placed by a deleted account stay on record.
+
 These are development-only credentials. When `ASPNETCORE_ENVIRONMENT` is not `Development`, the seeded admin password comes from the `ADMIN_SEED_PASSWORD` configuration value (environment variable); if it is unset, a random password is generated and the admin account stays locked. Set a strong `ADMIN_SEED_PASSWORD` before any deployment, keep it out of source control, and remove or replace both accounts before real use. This is a starter, not a production-ready store.
 
 ## Deploy with Docker (for example on Render)

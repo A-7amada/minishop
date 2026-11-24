@@ -18,4 +18,19 @@ public class UserRepository : IUserRepository
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
     }
+
+    public Task<List<AppUser>> ListAsync() => _db.Users.OrderBy(u => u.Email).ToListAsync();
+    public Task<AppUser?> FindByIdAsync(int id) => _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+    public async Task UpdateAsync(AppUser user)
+    {
+        _db.Users.Update(user);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(AppUser user)
+    {
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+    }
 }
