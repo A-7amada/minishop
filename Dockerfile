@@ -9,7 +9,7 @@ RUN dotnet restore src/MiniShop.Web/MiniShop.Web.csproj
 COPY src/ src/
 RUN dotnet publish src/MiniShop.Web/MiniShop.Web.csproj -c Release -o /app/publish --no-restore
 
-FROM mcr.microsoft.com/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
