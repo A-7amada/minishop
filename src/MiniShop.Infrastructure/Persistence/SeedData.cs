@@ -36,6 +36,19 @@ public static class SeedData
             var (demoHash, demoSalt) = PasswordHasher.Hash("Demo123!");
             db.Users.Add(new AppUser { Email = "demo@minishop.local", FullName = "Demo User", PasswordHash = demoHash, PasswordSalt = demoSalt });
         }
+        else if (!string.IsNullOrEmpty(adminPassword))
+        {
+            // Keep the deployed admin password in sync with ADMIN_SEED_PASSWORD even when
+            // the database already exists (e.g. an instance filesystem survived a redeploy).
+            var admin = db.Users.SingleOrDefault(u => u.Email == "admin@minishop.local");
+            if (admin is not null && !PasswordHasher.Verify(adminPassword, admin.PasswordHash, admin.PasswordSalt))
+            {
+                var (hash, salt) = PasswordHasher.Hash(adminPassword);
+                admin.PasswordHash = hash;
+                admin.PasswordSalt = salt;
+                Console.WriteLine("SeedData: admin password synced from ADMIN_SEED_PASSWORD.");
+            }
+        }
 
         if (!db.Coupons.Any()) db.Coupons.Add(new Coupon { Code="WELCOME10", Percent=10, ExpiresAt=DateTime.UtcNow.AddYears(1) });
         if (!db.ShippingZones.Any())
